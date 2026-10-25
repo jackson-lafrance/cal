@@ -9,6 +9,11 @@
 
 class Event {
 public:
+  friend bool operator<(const Event &lhs, const Event &rhs) {
+    return std::tie(lhs.start_, rhs.end_, lhs.title_) <
+           std::tie(rhs.start_, lhs.end_, rhs.title_);
+  }
+
   Event(Day start_day, Month start_month, Year start_year, Time start_mins,
         Day end_day, Month end_month, Year end_year, Time end_mins,
         std::string title)
