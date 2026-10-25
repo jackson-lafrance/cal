@@ -1,8 +1,10 @@
 #ifndef DATE_H
 #define DATE_H
+#include <cstdint>
 #include <iostream>
 #include <optional>
 #include <string>
+#include <tuple>
 
 using Time = std::uint32_t;
 using Day = std::uint8_t;
@@ -22,8 +24,6 @@ enum class Month {
   NOV,
   DEC,
 };
-
-using year = std::uint16_t;
 
 class Date {
 public:
