@@ -68,9 +68,9 @@ public:
     year_ = year;
   };
 
-  Day getDay() const { return day_; }
-  Month getMonth() const { return month_; }
-  Year getYear() const { return year_; }
+  Day day() const { return day_; }
+  Month month() const { return month_; }
+  Year year() const { return year_; }
 
 private:
   Day day_;
@@ -86,8 +86,8 @@ public:
 
   DateTime(Day day, Month month, Year year, Time mins)
       : date_(day, month, year), mins_(mins) {}
-  const Date &getDate() const { return date_; }
-  Time getTime() const { return mins_; }
+  const Date &date() const { return date_; }
+  Time mins() const { return mins_; }
 
 private:
   Date date_;
