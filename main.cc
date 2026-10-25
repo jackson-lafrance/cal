@@ -3,6 +3,7 @@
 #include <array>
 #include <cctype>
 #include <cstddef>
+#include <exception>
 #include <iostream>
 #include <math.h>
 #include <set>
@@ -32,15 +33,20 @@ int main() {
       break;
     }
 
-    if (command.compare(0, 3, "add")) {
-      EventOrTask result = add(command);
-      if (const Event *event = std::get_if<Event>(&result))
-        event_set.insert(*event);
-      else if (const Task *task = std::get_if<Task>(&result))
-        task_set.insert(*task);
-      else
-        throw std::logic_error("Invalid type result of `add`");
-    } else if (command.compare(0, 4, "quit"))
+    if (command.compare(0, 3, "add") == 0) {
+      try {
+        EventOrTask result = add(command);
+        if (const Event *event = std::get_if<Event>(&result))
+          event_set.insert(*event);
+        else if (const Task *task = std::get_if<Task>(&result))
+          task_set.insert(*task);
+        else
+          throw std::logic_error("Invalid type result of `add`");
+      } catch (std::exception &e) {
+        std::cout << e.what() << std::endl;
+        continue;
+      }
+    } else if (command.compare(0, 4, "quit") == 0)
       break;
     else
       std::cout << "Invalid command!" << std::endl;
@@ -73,7 +79,7 @@ int main() {
 
 EventOrTask add(const std::string &command) {
   std::string tester;
-  for (std::size_t i{0}; i < command.length(); ++i) {
+  for (std::size_t i{3}; i < command.length(); ++i) {
     if (command[i] == ' ')
       continue;
 
@@ -83,10 +89,10 @@ EventOrTask add(const std::string &command) {
     else if (tester.length() == 5 && tester == "event")
       return add_event(command.substr(i + 1));
     else if (tester.length() >= 5)
-      throw std::runtime_error("Invalid call to `add` with " + tester + "!");
+      throw std::runtime_error("Invalid call to `add` with " + command + "!");
   }
 
-  throw std::runtime_error("Invalid empty call to `add`!");
+  throw std::runtime_error("Invalid call to `add` with " + command + "!");
 }
 
 Event add_event(const std::string &command) {
@@ -143,7 +149,7 @@ Task add_task(const std::string &command) {
     fields.at(tracker) += letter;
   }
 
-  if (tracker != 8)
+  if (tracker != 4)
     throw std::runtime_error("Incorrect amount of arguments to `add task` (" +
                              std::to_string(tracker + 1) + ")!");
 

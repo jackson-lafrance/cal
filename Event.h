@@ -18,8 +18,10 @@ public:
         Day end_day, Month end_month, Year end_year, Time end_mins,
         std::string title)
       : start_(start_day, start_month, start_year, start_mins),
-        end_(end_day, end_month, end_year, end_mins),
-        title_(std::move(title)) {};
+        end_(end_day, end_month, end_year, end_mins), title_(std::move(title)) {
+    if (end_ < start_)
+      throw std::runtime_error("End time cannot be before start time!");
+  };
 
   const DateTime &start() const { return start_; }
   const DateTime &end() const { return end_; }
