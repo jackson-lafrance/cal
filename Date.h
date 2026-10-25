@@ -37,6 +37,7 @@ public:
   Day day() const;
   Month month() const;
   Year year() const;
+  std::string to_string() const;
 
 private:
   Day day_;
@@ -53,6 +54,7 @@ public:
   DateTime(Day day, Month month, Year year, Time mins);
   const Date &date() const;
   Time mins() const;
+  std::string to_string() const;
 
 private:
   Date date_;

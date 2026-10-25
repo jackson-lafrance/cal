@@ -1,4 +1,7 @@
 #include "Date.h"
+#include <iomanip>
+#include <sstream>
+#include <stdexcept>
 
 Date::Date(Day day, Month month, Year year) {
   if (day < 1)
@@ -25,11 +28,14 @@ Date::Date(Day day, Month month, Year year) {
     break;
   case Month::FEB:
     max_day = (!(year % 4) && year % 100) || !(year % 400) ? 29 : 28;
+    break;
+  default:
+    throw std::logic_error("Invalid month!");
   }
 
   if (day > max_day)
     throw std::runtime_error(std::string("Day must be <= ") +
-                             std::to_string(max_day));
+                             std::to_string(max_day) + std::string("!"));
 
   day_ = day;
   month_ = month;
@@ -40,8 +46,25 @@ Day Date::day() const { return day_; }
 Month Date::month() const { return month_; }
 Year Date::year() const { return year_; }
 
+std::string Date::to_string() const {
+  std::ostringstream result;
+
+  result << std::setfill('0') << std::setw(2) << day_ << "-" << std::setw(2)
+         << static_cast<int>(month_) + 1 << "-" << std::setw(4) << year_;
+
+  return result.str();
+}
+
 DateTime::DateTime(Day day, Month month, Year year, Time mins)
     : date_(day, month, year), mins_(mins) {}
 
 const Date &DateTime::date() const { return date_; }
 Time DateTime::mins() const { return mins_; }
+
+std::string DateTime::to_string() const {
+  std::ostringstream result;
+  result << date_.to_string() << "@" << std::setfill('0') << std::setw(2)
+         << mins_ / 60 << ":" << std::setw(2) << mins_ % 60;
+
+  return result.str();
+}
