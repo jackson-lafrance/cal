@@ -15,8 +15,8 @@ public:
        std::string title)
       : due_(due_day, due_month, due_year, due_mins), title_(title) {}
 
-  const DateTime &getDueTime() { return due_; }
-  const std::string &getTitle() { return title_; }
+  const DateTime &due() const { return due_; }
+  const std::string &title() const { return title_; }
 
 private:
   DateTime due_;

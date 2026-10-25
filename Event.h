@@ -21,9 +21,9 @@ public:
         end_(end_day, end_month, end_year, end_mins),
         title_(std::move(title)) {};
 
-  const DateTime &getStartTime() const { return start_; }
-  const DateTime &getEndTime() const { return end_; }
-  const std::string &getTitle() const { return title_; }
+  const DateTime &start() const { return start_; }
+  const DateTime &end() const { return end_; }
+  const std::string &title() const { return title_; }
 
 private:
   DateTime start_;
