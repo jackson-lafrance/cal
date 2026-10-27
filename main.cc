@@ -36,24 +36,21 @@ int main() {
 
   for (;;) {
     std::string command;
+    std::string error;
 
     if (!std::getline(std::cin, command)) {
       break;
     }
 
+    try {
     if (!command.compare(0, 3, "add")) {
-      try {
-        EventOrTask result = add(command);
-        if (const Event *event = std::get_if<Event>(&result))
-          event_set.insert(*event);
-        else if (const Task *task = std::get_if<Task>(&result))
-          task_set.insert(*task);
-        else
-          throw std::logic_error("Invalid type result of `add`");
-      } catch (std::exception &e) {
-        std::cout << e.what() << std::endl;
-        continue;
-      }
+      EventOrTask result = add(command);
+      if (const Event *event = std::get_if<Event>(&result))
+        event_set.insert(*event);
+      else if (const Task *task = std::get_if<Task>(&result))
+        task_set.insert(*task);
+      else
+        throw std::logic_error("Invalid type result of `add`");
     } else if (!command.compare(0, 4, "next") ||
                !command.compare(0, 4, "prev")) {
       std::size_t i = 4;
@@ -84,9 +81,17 @@ int main() {
     } else if (!command.compare(0, 4, "quit"))
       break;
     else
-      std::cout << "Invalid command!" << std::endl;
+      throw std::runtime_error("Invalid command!");
+    } catch (const std::exception &e){
+      error = e.what();
+    }
 
-    Display::print_screen(event_set, task_set, start_cursor);
+    try {
+    Display::print_screen(event_set, task_set, start_cursor, error);
+    } catch (const std::exception &e) {
+      std::cout << e.what();
+      exit(1);
+    }
   }
 
   return 0;
@@ -95,9 +100,7 @@ int main() {
 void seed_fake_data(Events &events, Tasks &tasks) {
   constexpr Year year = 2026;
 
-  const auto at = [](Time hour, Time minute) {
-    return hour * 60 + minute;
-  };
+  const auto at = [](Time hour, Time minute) { return hour * 60 + minute; };
 
   // Tuesday, October 27
   events.emplace(27, Month::OCT, year, at(7, 30), 27, Month::OCT, year,
@@ -106,18 +109,15 @@ void seed_fake_data(Events &events, Tasks &tasks) {
                  at(9, 0), "Daily planning");
   events.emplace(27, Month::OCT, year, at(10, 0), 27, Month::OCT, year,
                  at(11, 15), "C++ lecture");
-  tasks.emplace(27, Month::OCT, year, at(9, 15),
-                "Reply to project emails");
+  tasks.emplace(27, Month::OCT, year, at(9, 15), "Reply to project emails");
   tasks.emplace(27, Month::OCT, year, at(12, 0), "Submit parser exercise");
   events.emplace(27, Month::OCT, year, at(12, 30), 27, Month::OCT, year,
                  at(13, 15), "Lunch with Alex");
-  tasks.emplace(27, Month::OCT, year, at(14, 30),
-                "Update calendar README");
+  tasks.emplace(27, Month::OCT, year, at(14, 30), "Update calendar README");
   tasks.emplace(27, Month::OCT, year, at(18, 0), "Buy groceries");
   events.emplace(27, Month::OCT, year, at(19, 0), 27, Month::OCT, year,
                  at(20, 30), "Evening gym session");
-  tasks.emplace(27, Month::OCT, year, at(21, 30),
-                "Prepare tomorrow's notes");
+  tasks.emplace(27, Month::OCT, year, at(21, 30), "Prepare tomorrow's notes");
 
   // Wednesday, October 28
   events.emplace(28, Month::OCT, year, at(7, 45), 28, Month::OCT, year,
@@ -129,36 +129,30 @@ void seed_fake_data(Events &events, Tasks &tasks) {
                  at(13, 0), "Library study block");
   events.emplace(28, Month::OCT, year, at(14, 0), 28, Month::OCT, year,
                  at(15, 0), "Dentist appointment");
-  tasks.emplace(28, Month::OCT, year, at(13, 30),
-                "Refactor date validation");
-  tasks.emplace(28, Month::OCT, year, at(17, 30),
-                "Review DateTime edge cases");
+  tasks.emplace(28, Month::OCT, year, at(13, 30), "Refactor date validation");
+  tasks.emplace(28, Month::OCT, year, at(17, 30), "Review DateTime edge cases");
   events.emplace(28, Month::OCT, year, at(18, 0), 28, Month::OCT, year,
                  at(19, 0), "Cook dinner");
   tasks.emplace(28, Month::OCT, year, at(19, 30), "Call family");
-  tasks.emplace(28, Month::OCT, year, at(22, 0),
-                "Read two C++ chapters");
+  tasks.emplace(28, Month::OCT, year, at(22, 0), "Read two C++ chapters");
 
   // Thursday, October 29
   events.emplace(29, Month::OCT, year, at(7, 30), 29, Month::OCT, year,
                  at(8, 15), "Morning run");
   events.emplace(29, Month::OCT, year, at(8, 30), 29, Month::OCT, year,
                  at(9, 0), "Breakfast");
-  tasks.emplace(29, Month::OCT, year, at(9, 30),
-                "Check compiler warnings");
+  tasks.emplace(29, Month::OCT, year, at(9, 30), "Check compiler warnings");
   events.emplace(29, Month::OCT, year, at(10, 0), 29, Month::OCT, year,
                  at(11, 20), "Algorithms lecture");
   tasks.emplace(29, Month::OCT, year, at(12, 0),
                 "Finish display header design");
   events.emplace(29, Month::OCT, year, at(13, 0), 29, Month::OCT, year,
                  at(15, 30), "Calendar UI implementation");
-  tasks.emplace(29, Month::OCT, year, at(16, 0),
-                "Send weekly progress update");
+  tasks.emplace(29, Month::OCT, year, at(16, 0), "Send weekly progress update");
   tasks.emplace(29, Month::OCT, year, at(17, 0), "Wash laundry");
   events.emplace(29, Month::OCT, year, at(18, 0), 29, Month::OCT, year,
                  at(19, 0), "Grocery run");
-  tasks.emplace(29, Month::OCT, year, at(20, 30),
-                "Plan weekend schedule");
+  tasks.emplace(29, Month::OCT, year, at(20, 30), "Plan weekend schedule");
 
   // Friday, October 30
   events.emplace(30, Month::OCT, year, at(7, 30), 30, Month::OCT, year,
@@ -172,8 +166,7 @@ void seed_fake_data(Events &events, Tasks &tasks) {
                  at(13, 30), "Lunch break");
   tasks.emplace(30, Month::OCT, year, at(13, 45),
                 "Review command parser errors");
-  tasks.emplace(30, Month::OCT, year, at(15, 0),
-                "Fix printing alignment bug");
+  tasks.emplace(30, Month::OCT, year, at(15, 0), "Fix printing alignment bug");
   tasks.emplace(30, Month::OCT, year, at(17, 30), "Clean apartment");
   events.emplace(30, Month::OCT, year, at(20, 0), 30, Month::OCT, year,
                  at(22, 0), "Movie night");
@@ -181,22 +174,18 @@ void seed_fake_data(Events &events, Tasks &tasks) {
                 "Charge laptop and headphones");
 
   // Saturday, October 31
-  events.emplace(31, Month::OCT, year, at(8, 0), 31, Month::OCT, year,
-                 at(9, 0), "Morning walk");
-  tasks.emplace(31, Month::OCT, year, at(9, 30),
-                "Finish weekend assignment");
+  events.emplace(31, Month::OCT, year, at(8, 0), 31, Month::OCT, year, at(9, 0),
+                 "Morning walk");
+  tasks.emplace(31, Month::OCT, year, at(9, 30), "Finish weekend assignment");
   events.emplace(31, Month::OCT, year, at(10, 0), 31, Month::OCT, year,
                  at(11, 30), "Halloween brunch");
-  tasks.emplace(31, Month::OCT, year, at(12, 0),
-                "Confirm party address");
+  tasks.emplace(31, Month::OCT, year, at(12, 0), "Confirm party address");
   events.emplace(31, Month::OCT, year, at(19, 0), 31, Month::OCT, year,
                  at(22, 0), "Costume party");
-  tasks.emplace(31, Month::OCT, year, at(13, 0),
-                "Pick up Halloween candy");
+  tasks.emplace(31, Month::OCT, year, at(13, 0), "Pick up Halloween candy");
   events.emplace(31, Month::OCT, year, at(14, 0), 31, Month::OCT, year,
                  at(16, 0), "Pumpkin carving");
-  tasks.emplace(31, Month::OCT, year, at(16, 30),
-                "Take costume photos");
+  tasks.emplace(31, Month::OCT, year, at(16, 30), "Take costume photos");
   events.emplace(31, Month::OCT, year, at(17, 30), 31, Month::OCT, year,
                  at(19, 0), "Dinner with friends");
   tasks.emplace(31, Month::OCT, year, at(23, 0),

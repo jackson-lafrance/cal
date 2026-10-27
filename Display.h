@@ -15,12 +15,13 @@ inline const int H = 24;
 
 class Display {
 public:
-  static void print_screen(Events event_set, Tasks task_set, DateTime start) {
+  static void print_screen(Events event_set, Tasks task_set, DateTime start,
+                           const std::string &error) {
     Display display;
 
     std::cout << CSI << "2J" << CSI << "H";
 
-    display.print_all(event_set, task_set, start);
+    display.print_all(event_set, task_set, start, error);
 
     std::cout << std::flush;
   }
@@ -45,7 +46,8 @@ private:
     jump();
   }
 
-  void print_all(Events event_set, Tasks task_set, DateTime start) {
+  void print_all(Events event_set, Tasks task_set, DateTime start,
+                 const std::string &error) {
     DateTime cursor(start);
     DateTime end(start);
 
@@ -58,7 +60,7 @@ private:
       throw std::runtime_error("Terminal too small!");
 
     cursor.change(1);
-    end.change((size.ws_col / W - 1) * (size.ws_row / H));
+    end.change((size.ws_col / W - 1) * (size.ws_row / (H + 2)));
 
     int i = 0;
     int default_top = 0;
@@ -86,6 +88,14 @@ private:
         default_top += H;
       }
     }
+
+    top_ = size.ws_row - 2;
+    left_ = 0;
+    jump();
+    std::cout << CSI << "2K" << "\r" << error;
+    top_++;
+    jump();
+    std::cout << CSI << "2K" << "\r" << " > ";
   }
 
   void print_day(Events event_set, Tasks task_set) {
