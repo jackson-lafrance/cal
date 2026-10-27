@@ -10,8 +10,16 @@
 class Event {
 public:
   friend bool operator<(const Event &lhs, const Event &rhs) {
-    return std::tie(lhs.start_, rhs.end_, lhs.title_) <
-           std::tie(rhs.start_, lhs.end_, rhs.title_);
+    return std::tie(lhs.start_, lhs.end_, lhs.title_) <
+           std::tie(rhs.start_, rhs.end_, rhs.title_);
+  }
+
+  friend bool operator<(const Event &lhs, const DateTime &rhs) {
+    return std::tie(lhs.start_) < std::tie(rhs);
+  }
+
+  friend bool operator<(const DateTime &lhs, const Event &rhs) {
+    return std::tie(lhs) < std::tie(rhs.start_);
   }
 
   Event(Day start_day, Month start_month, Year start_year, Time start_mins,
@@ -59,6 +67,6 @@ private:
   std::string title_;
 };
 
-using Events = std::set<Event>;
+using Events = std::set<Event, std::less<>>;
 
 #endif // EVENT_H

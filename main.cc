@@ -28,16 +28,10 @@ int main() {
   int month = localTime->tm_mon;
   int year = localTime->tm_year + 1900;
 
-  Event start_event(day, static_cast<Month>(month), year, 0, day,
-                    static_cast<Month>(month), year, 0, "ZZZZZZ");
-  Event end_event(day, static_cast<Month>(month), year, 1439, day,
-                  static_cast<Month>(month), year, 1439, "ZZZZZZ");
+  DateTime start_cursor(day, static_cast<Month>(month), year, 0);
+  DateTime end_cursor(start_cursor);
 
-  Task start_task(day, static_cast<Month>(month), year, 0, "ZZZZZZ");
-  Task end_task(day, static_cast<Month>(month), year, 1439, "ZZZZZZ");
-
-  end_event.change_both_date(6);
-  end_task.change_due_date(6);
+  end_cursor.change(7);
 
   Events event_set;
   Tasks task_set;
@@ -88,23 +82,20 @@ int main() {
       if (!command.compare(0, 4, "prev"))
         amt = -amt;
 
-      start_task.change_due_date(amt);
-      end_task.change_due_date(amt);
-      start_event.change_both_date(amt);
-      end_event.change_both_date(amt);
+      start_cursor.change(amt);
+      end_cursor.change(amt);
     } else if (!command.compare(0, 4, "quit"))
       break;
     else
       std::cout << "Invalid command!" << std::endl;
 
-    Events events_slice(event_set.lower_bound(start_event),
-                        event_set.upper_bound(end_event));
-    Tasks tasks_slice(task_set.lower_bound(start_task),
-                      task_set.upper_bound(end_task));
-
-    std::cout << "Showing tasks from " << start_event.start().to_string()
-              << " to " << end_event.end().to_string() << std::endl;
-    Display::print_events_and_tasks(events_slice, tasks_slice);
+    Events events_slice(event_set.lower_bound(start_cursor),
+                        event_set.upper_bound(end_cursor));
+    Tasks tasks_slice(task_set.lower_bound(start_cursor),
+                      task_set.upper_bound(end_cursor));
+    std::cout << "Showing tasks from " << start_cursor.to_string() << " to "
+              << end_cursor.to_string() << std::endl;
+    Display::print_screen(events_slice, tasks_slice, start_cursor, end_cursor);
   }
 
   return 0;

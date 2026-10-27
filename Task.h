@@ -11,6 +11,14 @@ public:
     return std::tie(lhs.due_, lhs.title_) < std::tie(rhs.due_, rhs.title_);
   }
 
+  friend bool operator<(const Task &lhs, const DateTime &rhs) {
+    return std::tie(lhs.due_) < std::tie(rhs);
+  }
+
+  friend bool operator<(const DateTime &lhs, const Task &rhs) {
+    return std::tie(lhs) < std::tie(rhs.due_);
+  }
+
   Task(Day due_day, Month due_month, Year due_year, Time due_mins,
        std::string title)
       : due_(due_day, due_month, due_year, due_mins), title_(title) {}
@@ -29,6 +37,6 @@ private:
   std::string title_;
 };
 
-using Tasks = std::set<Task>;
+using Tasks = std::set<Task, std::less<>>;
 
 #endif // TASK_H
