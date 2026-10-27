@@ -25,12 +25,40 @@ public:
 
   const DateTime &start() const { return start_; }
   const DateTime &end() const { return end_; }
+  void
+  change_start_date(Day day, Month month, Year year,
+                    Time mins = std::numeric_limits<std::uint16_t>::max()) {
+    start_.set_date(day, month, year, mins);
+  }
+
+  void change_end_date(Day day, Month month, Year year,
+                       Time mins = std::numeric_limits<std::uint16_t>::max()) {
+    end_.set_date(day, month, year, mins);
+  };
+
   const std::string &title() const { return title_; }
+  void increment_both_date(std::size_t amt) {
+    end_.increment(amt);
+    start_.increment(amt);
+  }
+
+  void increment_start_date(std::size_t amt) {
+    DateTime temp(start_);
+    temp.increment(amt);
+    if (end_ < temp)
+      throw std::runtime_error("Cannot increment start date past end date!");
+
+    start_.increment(amt);
+  }
+
+  void increment_end_date(std::size_t amt) { end_.increment(amt); }
 
 private:
   DateTime start_;
   DateTime end_;
   std::string title_;
 };
+
+using Events = std::set<Event>;
 
 #endif // EVENT_H

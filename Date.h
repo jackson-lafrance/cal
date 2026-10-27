@@ -2,6 +2,7 @@
 #define DATE_H
 #include <cstdint>
 #include <iostream>
+#include <limits>
 #include <optional>
 #include <string>
 #include <tuple>
@@ -25,40 +26,31 @@ enum class Month {
   DEC,
 };
 
-class Date {
-public:
-  friend bool operator<(Date lhs, Date rhs) {
-    return std::tie(lhs.year_, lhs.month_, lhs.day_) <
-           std::tie(rhs.year_, rhs.month_, rhs.day_);
-  }
-
-  Date(Day day, Month month, Year year);
-
-  Day day() const;
-  Month month() const;
-  Year year() const;
-  std::string to_string() const;
-
-private:
-  Day day_;
-  Month month_;
-  Year year_;
-};
-
 class DateTime {
 public:
   friend bool operator<(DateTime lhs, DateTime rhs) {
-    return std::tie(lhs.date_, lhs.mins_) < std::tie(rhs.date_, rhs.mins_);
+    return std::tie(lhs.year_, lhs.month_, lhs.day_, lhs.mins_) <
+           std::tie(rhs.year_, rhs.month_, rhs.day_, rhs.mins_);
   }
 
   DateTime(Day day, Month month, Year year, Time mins);
-  const Date &date() const;
+  Day day() const;
+  Month month() const;
+  Year year() const;
   Time mins() const;
   std::string to_string() const;
 
+  void set_date(Day day, Month month, Year year, Time mins);
+  void increment(std::size_t amt);
+
 private:
-  Date date_;
   Time mins_;
+  Day day_;
+  Month month_;
+  Year year_;
+
+  void check_valid_date(Day day, Month month, Year year, Time mins);
+  Day get_max_day(Month month, Year year) const;
 };
 
 #endif // DATE_H

@@ -17,10 +17,18 @@ public:
 
   const DateTime &due() const { return due_; }
   const std::string &title() const { return title_; }
+  void change_due_date(Day day, Month month, Year year,
+                       Time mins = std::numeric_limits<std::uint16_t>::max()) {
+    due_.set_date(day, static_cast<Month>(month), year, mins);
+  }
+
+  void increment_due_date(std::size_t amt) { due_.increment(amt); }
 
 private:
   DateTime due_;
   std::string title_;
 };
+
+using Tasks = std::set<Task>;
 
 #endif // TASK_H

@@ -1,28 +1,45 @@
+#include "Display.h"
 #include "Event.h"
 #include "Task.h"
 #include <array>
 #include <cctype>
 #include <cstddef>
+#include <ctime>
 #include <exception>
 #include <iostream>
 #include <math.h>
-#include <set>
 #include <stdexcept>
 #include <string>
 #include <utility>
+#include <valarray>
 #include <variant>
 
-using Events = std::set<Event>;
-using Tasks = std::set<Task>;
 using EventOrTask = std::variant<Event, Task>;
 
 EventOrTask add(const std::string &command);
 Event add_event(const std::string &command);
 Task add_task(const std::string &command);
-
 Time parse_time(const std::string &time);
 
 int main() {
+  std::time_t now = std::time(nullptr);
+  std::tm *localTime = std::localtime(&now);
+
+  int day = localTime->tm_mday;
+  int month = localTime->tm_mon;
+  int year = localTime->tm_year + 1900;
+
+  Event start_event(day, static_cast<Month>(month), year, 0, day,
+                    static_cast<Month>(month), year, 0, "ZZZZZZ");
+  Event end_event(day, static_cast<Month>(month), year, 1439, day,
+                  static_cast<Month>(month), year, 1439, "ZZZZZZ");
+
+  Task start_task(day, static_cast<Month>(month), year, 0, "ZZZZZZ");
+  Task end_task(day, static_cast<Month>(month), year, 1439, "ZZZZZZ");
+
+  end_event.increment_both_date(6);
+  end_task.increment_due_date(6);
+
   Events event_set;
   Tasks task_set;
 
@@ -51,27 +68,12 @@ int main() {
     else
       std::cout << "Invalid command!" << std::endl;
 
-    auto e = event_set.begin();
-    auto t = task_set.begin();
+    Events events_slice(event_set.lower_bound(start_event),
+                        event_set.upper_bound(end_event));
+    Tasks tasks_slice(task_set.lower_bound(start_task),
+                      task_set.upper_bound(end_task));
 
-    while (e != event_set.end() || t != task_set.end()) {
-      if (e == event_set.end()) {
-        std::cout << "TASK " << t->title() << ": " << t->due().to_string()
-                  << std::endl;
-        ++t;
-      } else if (t == task_set.end()) {
-        std::cout << "EVENT " << e->title() << ": " << e->start().to_string()
-                  << " to " << e->end().to_string() << std::endl;
-        ++e;
-      } else if (e->start() < t->due()) {
-        std::cout << "EVENT " << e->title() << ": " << e->start().to_string()
-                  << " to " << e->end().to_string() << std::endl;
-        ++e;
-      } else {
-        std::cout << "TASK " << t->title() << ": " << t->due().to_string();
-        ++t;
-      }
-    }
+    Display::print_events_and_tasks(events_slice, tasks_slice);
   }
 
   return 0;
