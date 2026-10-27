@@ -23,7 +23,8 @@ inline void print_events_and_tasks(Events event_set, Tasks task_set) {
                 << " to " << e->end().to_string() << std::endl;
       ++e;
     } else {
-      std::cout << "TASK " << t->title() << ": " << t->due().to_string() << std::endl;
+      std::cout << "TASK " << t->title() << ": " << t->due().to_string()
+                << std::endl;
       ++t;
     }
   }
