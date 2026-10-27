@@ -1,8 +1,8 @@
 #include "Date.h"
 #include <iomanip>
-#include <type_traits>
 #include <sstream>
 #include <stdexcept>
+#include <type_traits>
 
 DateTime::DateTime(Day day, Month month, Year year, Time mins) {
   check_valid_date(day, month, year, mins);
@@ -51,10 +51,10 @@ void DateTime::check_valid_date(Day day, Month month, Year year, Time mins) {
                              std::to_string(max_day) + std::string("!"));
 }
 
-void DateTime::increment(std::size_t amt) {
+void DateTime::change(int amt) {
   while (amt > 0) {
     const Day max_day = get_max_day(month_, year_);
-    const std::size_t days_left = static_cast<std::size_t>(max_day - day_);
+    const int days_left = max_day - day_;
 
     if (amt <= days_left) {
       day_ = static_cast<Day>(day_ + amt);
@@ -70,6 +70,27 @@ void DateTime::increment(std::size_t amt) {
     } else
       month_ = static_cast<Month>(
           static_cast<std::underlying_type_t<Month>>(month_) + 1);
+  }
+
+  while (amt < 0) {
+    if (-amt < day_) {
+      day_ = static_cast<Day>(day_ + amt);
+      return;
+    }
+
+    amt += day_;
+
+    if (month_ == Month::JAN) {
+      if (year_ == 2000)
+        throw std::runtime_error("Date cannot be before year 2000");
+      --year_;
+      month_ = Month::DEC;
+    } else {
+      month_ = static_cast<Month>(
+          static_cast<std::underlying_type_t<Month>>(month_) - 1);
+    }
+
+    day_ = get_max_day(month_, year_);
   }
 }
 

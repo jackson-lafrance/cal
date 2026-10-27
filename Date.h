@@ -41,7 +41,7 @@ public:
   std::string to_string() const;
 
   void set_date(Day day, Month month, Year year, Time mins);
-  void increment(std::size_t amt);
+  void change(int amt);
 
 private:
   Time mins_;

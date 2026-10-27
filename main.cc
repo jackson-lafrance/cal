@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <string>
 #include <utility>
-#include <valarray>
 #include <variant>
 
 using EventOrTask = std::variant<Event, Task>;
@@ -37,8 +36,8 @@ int main() {
   Task start_task(day, static_cast<Month>(month), year, 0, "ZZZZZZ");
   Task end_task(day, static_cast<Month>(month), year, 1439, "ZZZZZZ");
 
-  end_event.increment_both_date(6);
-  end_task.increment_due_date(6);
+  end_event.change_both_date(6);
+  end_task.change_due_date(6);
 
   Events event_set;
   Tasks task_set;
@@ -63,6 +62,16 @@ int main() {
         std::cout << e.what() << std::endl;
         continue;
       }
+    } else if (command.compare(0, 4, "next") == 0) {
+      start_task.change_due_date(1);
+      end_task.change_due_date(1);
+      start_event.change_both_date(1);
+      end_event.change_both_date(1);
+    } else if (command.compare(0, 4, "prev") == 0) {
+      start_task.change_due_date(-1);
+      end_task.change_due_date(-1);
+      start_event.change_both_date(-1);
+      end_event.change_both_date(-1);
     } else if (command.compare(0, 4, "quit") == 0)
       break;
     else

@@ -37,21 +37,21 @@ public:
   };
 
   const std::string &title() const { return title_; }
-  void increment_both_date(std::size_t amt) {
-    end_.increment(amt);
-    start_.increment(amt);
+  void change_both_date(int amt) {
+    end_.change(amt);
+    start_.change(amt);
   }
 
-  void increment_start_date(std::size_t amt) {
+  void change_start_date(int amt) {
     DateTime temp(start_);
-    temp.increment(amt);
+    temp.change(amt);
     if (end_ < temp)
-      throw std::runtime_error("Cannot increment start date past end date!");
+      throw std::runtime_error("Cannot change start date past end date!");
 
-    start_.increment(amt);
+    start_.change(amt);
   }
 
-  void increment_end_date(std::size_t amt) { end_.increment(amt); }
+  void change_end_date(int amt) { end_.change(amt); }
 
 private:
   DateTime start_;

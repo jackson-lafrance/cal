@@ -22,7 +22,7 @@ public:
     due_.set_date(day, static_cast<Month>(month), year, mins);
   }
 
-  void increment_due_date(std::size_t amt) { due_.increment(amt); }
+  void change_due_date(int amt) { due_.change(amt); }
 
 private:
   DateTime due_;
