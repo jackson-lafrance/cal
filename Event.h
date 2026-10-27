@@ -27,6 +27,9 @@ public:
         std::string title)
       : start_(start_day, start_month, start_year, start_mins),
         end_(end_day, end_month, end_year, end_mins), title_(std::move(title)) {
+    if (title_.length() > 52) {
+      throw std::runtime_error("Title length must be <= 52");
+    }
     if (end_ < start_)
       throw std::runtime_error("End time cannot be before start time!");
   };
@@ -44,7 +47,16 @@ public:
     end_.set_date(day, month, year, mins);
   };
 
-  const std::string &title() const { return title_; }
+  const std::string title(int line = 0) const {
+    if (line == 0)
+      return title_;
+    if (line == 1)
+      return title_.substr(0, 26);
+    if (line == 2 && title_.length() / 26 > 0)
+      return title_.substr(26, 26);
+
+    throw std::logic_error("Requested line larger than title has!");
+  }
   void change_both_date(int amt) {
     end_.change(amt);
     start_.change(amt);

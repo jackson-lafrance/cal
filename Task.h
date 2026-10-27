@@ -21,10 +21,22 @@ public:
 
   Task(Day due_day, Month due_month, Year due_year, Time due_mins,
        std::string title)
-      : due_(due_day, due_month, due_year, due_mins), title_(title) {}
+      : due_(due_day, due_month, due_year, due_mins), title_(title) {
+    if (title_.length() > 52)
+      throw std::runtime_error("Title must be <= 52 chars");
+  }
 
   const DateTime &due() const { return due_; }
-  const std::string &title() const { return title_; }
+  const std::string title(int line = 0) const {
+    if (line == 0)
+      return title_;
+    if (line == 1)
+      return title_.substr(0, 26);
+    if (line == 2 && title_.length() / 26 > 0)
+      return title_.substr(26, 26);
+
+    throw std::logic_error("Requested line larger than title has!");
+  }
   void change_due_date(Day day, Month month, Year year,
                        Time mins = std::numeric_limits<std::uint16_t>::max()) {
     due_.set_date(day, static_cast<Month>(month), year, mins);

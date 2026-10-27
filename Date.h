@@ -38,7 +38,8 @@ public:
   Month month() const;
   Year year() const;
   Time mins() const;
-  std::string to_string() const;
+  std::string time_string() const;
+  std::string date_string() const;
 
   void set_date(Day day, Month month, Year year, Time mins);
   void change(int amt);

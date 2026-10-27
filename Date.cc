@@ -26,15 +26,20 @@ Month DateTime::month() const { return month_; }
 Year DateTime::year() const { return year_; }
 Time DateTime::mins() const { return mins_; }
 
-std::string DateTime::to_string() const {
+std::string DateTime::time_string() const {
   std::ostringstream result;
-  result << std::setfill('0') << std::setw(2) << day_ << "-" << std::setw(2)
-         << static_cast<int>(month_) + 1 << "-" << std::setw(4) << year_ << "@"
-         << std::setfill('0') << std::setw(2) << mins_ / 60 << ":"
+  result << std::setfill('0') << std::setw(2) << mins_ / 60 << ":"
          << std::setw(2) << mins_ % 60;
 
   return result.str();
-}
+};
+std::string DateTime::date_string() const {
+  std::ostringstream result;
+  result << std::setfill('0') << std::setw(2) << day_ << "-" << std::setw(2)
+         << static_cast<int>(month_) + 1 << "-" << std::setw(4) << year_;
+
+  return result.str();
+};
 
 void DateTime::check_valid_date(Day day, Month month, Year year, Time mins) {
   if (mins > 1439 && mins != std::numeric_limits<std::uint16_t>::max())
