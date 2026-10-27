@@ -49,7 +49,7 @@ int main() {
       break;
     }
 
-    if (command.compare(0, 3, "add") == 0) {
+    if (!command.compare(0, 3, "add")) {
       try {
         EventOrTask result = add(command);
         if (const Event *event = std::get_if<Event>(&result))
@@ -62,17 +62,37 @@ int main() {
         std::cout << e.what() << std::endl;
         continue;
       }
-    } else if (command.compare(0, 4, "next") == 0) {
-      start_task.change_due_date(1);
-      end_task.change_due_date(1);
-      start_event.change_both_date(1);
-      end_event.change_both_date(1);
-    } else if (command.compare(0, 4, "prev") == 0) {
-      start_task.change_due_date(-1);
-      end_task.change_due_date(-1);
-      start_event.change_both_date(-1);
-      end_event.change_both_date(-1);
-    } else if (command.compare(0, 4, "quit") == 0)
+    } else if (!command.compare(0, 4, "next") ||
+               !command.compare(0, 4, "prev")) {
+      std::size_t i = 4;
+      int amt = 0;
+      while (i < command.length()) {
+        if (command[i] == ' ') {
+          ++i;
+          continue;
+        }
+
+        if (!std::isdigit(command[i])) {
+          throw std::runtime_error(
+              "Unable to parse argument to " +
+              std::string(command.compare(0, 4, "next") ? "prev" : "next"));
+        }
+
+        amt = amt * 10 + (command[i] - '0');
+        ++i;
+      }
+
+      if (amt == 0)
+        amt = 1;
+
+      if (!command.compare(0, 4, "prev"))
+        amt = -amt;
+
+      start_task.change_due_date(amt);
+      end_task.change_due_date(amt);
+      start_event.change_both_date(amt);
+      end_event.change_both_date(amt);
+    } else if (!command.compare(0, 4, "quit"))
       break;
     else
       std::cout << "Invalid command!" << std::endl;
