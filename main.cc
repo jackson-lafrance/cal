@@ -73,6 +73,8 @@ int main() {
     Tasks tasks_slice(task_set.lower_bound(start_task),
                       task_set.upper_bound(end_task));
 
+    std::cout << "Showing tasks from " << start_event.start().to_string()
+              << " to " << end_event.end().to_string() << std::endl;
     Display::print_events_and_tasks(events_slice, tasks_slice);
   }
 
