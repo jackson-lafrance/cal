@@ -27,10 +27,10 @@ int main() {
   std::tm *localTime = std::localtime(&now);
 
   int day = localTime->tm_mday;
-  int month = localTime->tm_mon;
+  int month = localTime->tm_mon + 1;
   int year = localTime->tm_year + 1900;
 
-  DateTime start_cursor(day, static_cast<Month>(month), year, 0);
+  DateTime start_cursor(day, month, year, 0);
 
   Events event_set;
   Tasks task_set;
@@ -56,6 +56,9 @@ int main() {
     if (!std::getline(std::cin, command)) {
       break;
     }
+
+    std::transform(command.begin(), command.end(), command.begin(),
+                   [](unsigned char letter) { return std::tolower(letter); });
 
     try {
       if (!command.compare(0, 3, "add")) {
@@ -169,11 +172,11 @@ Event add_event(const std::string &command) {
     throw std::runtime_error("Incorrect amount of arguments to `add event` (" +
                              std::to_string(tracker + 1) + ")!");
 
-  return Event(
-      std::stoi(fields[0]), static_cast<Month>(std::stoi(fields[1]) - 1),
-      std::stoi(fields[2]), parse_time(fields[3]), std::stoi(fields[4]),
-      static_cast<Month>(std::stoi(fields[5]) - 1), std::stoi(fields[6]),
-      parse_time(fields[7]), std::move(fields[8]));
+  return Event(std::stoi(fields[0]), std::stoi(fields[1]),
+               std::stoi(fields[2]), parse_time(fields[3]),
+               std::stoi(fields[4]), std::stoi(fields[5]),
+               std::stoi(fields[6]), parse_time(fields[7]),
+               std::move(fields[8]));
 }
 
 Task add_task(const std::string &command) {
@@ -201,9 +204,9 @@ Task add_task(const std::string &command) {
     throw std::runtime_error("Incorrect amount of arguments to `add task` (" +
                              std::to_string(tracker + 1) + ")!");
 
-  return Task(
-      std::stoi(fields[0]), static_cast<Month>(std::stoi(fields[1]) - 1),
-      std::stoi(fields[2]), parse_time(fields[3]), std::move(fields[4]));
+  return Task(std::stoi(fields[0]), std::stoi(fields[1]),
+              std::stoi(fields[2]), parse_time(fields[3]),
+              std::move(fields[4]));
 };
 
 Time parse_time(const std::string &time) {

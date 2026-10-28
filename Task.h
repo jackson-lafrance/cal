@@ -42,7 +42,7 @@ public:
   }
   void change_due_date(Day day, Month month, Year year,
                        Time mins = std::numeric_limits<std::uint16_t>::max()) {
-    due_.set_date(day, static_cast<Month>(month), year, mins);
+    due_.set_date(day, month, year, mins);
   }
 
   void change_due_date(int amt) { due_.change(amt); }

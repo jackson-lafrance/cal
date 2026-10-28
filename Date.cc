@@ -2,7 +2,6 @@
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
-#include <type_traits>
 
 DateTime::DateTime(Day day, Month month, Year year, Time mins) {
   check_valid_date(day, month, year, mins);
@@ -36,7 +35,7 @@ std::string DateTime::time_string() const {
 std::string DateTime::date_string() const {
   std::ostringstream result;
   result << std::setfill('0') << std::setw(2) << day_ << "-" << std::setw(2)
-         << static_cast<int>(month_) + 1 << "-" << std::setw(4) << year_;
+         << month_ << "-" << std::setw(4) << year_;
 
   return result.str();
 };
@@ -46,6 +45,8 @@ void DateTime::check_valid_date(Day day, Month month, Year year, Time mins) {
     throw std::runtime_error("Time must be < 1440");
   if (day < 1)
     throw std::runtime_error("Day must be > 0");
+  if (month < 1 || month > 12)
+    throw std::runtime_error("Month must be between 1 and 12");
   if (year < 2000)
     throw std::runtime_error("Year must be >= 2000");
 
@@ -69,12 +70,11 @@ void DateTime::change(int amt) {
     amt -= days_left + 1;
     day_ = 1;
 
-    if (month_ == Month::DEC) {
+    if (month_ == 12) {
       ++year_;
-      month_ = Month::JAN;
+      month_ = 1;
     } else
-      month_ = static_cast<Month>(
-          static_cast<std::underlying_type_t<Month>>(month_) + 1);
+      ++month_;
   }
 
   while (amt < 0) {
@@ -85,14 +85,13 @@ void DateTime::change(int amt) {
 
     amt += day_;
 
-    if (month_ == Month::JAN) {
+    if (month_ == 1) {
       if (year_ == 2000)
         throw std::runtime_error("Date cannot be before year 2000");
       --year_;
-      month_ = Month::DEC;
+      month_ = 12;
     } else {
-      month_ = static_cast<Month>(
-          static_cast<std::underlying_type_t<Month>>(month_) - 1);
+      --month_;
     }
 
     day_ = get_max_day(month_, year_);
@@ -101,20 +100,20 @@ void DateTime::change(int amt) {
 
 Day DateTime::get_max_day(Month month, Year year) const {
   switch (month) {
-  case Month::JAN:
-  case Month::MAR:
-  case Month::MAY:
-  case Month::JUL:
-  case Month::AUG:
-  case Month::OCT:
-  case Month::DEC:
+  case 1:
+  case 3:
+  case 5:
+  case 7:
+  case 8:
+  case 10:
+  case 12:
     return 31;
-  case Month::APR:
-  case Month::JUN:
-  case Month::SEP:
-  case Month::NOV:
+  case 4:
+  case 6:
+  case 9:
+  case 11:
     return 30;
-  case Month::FEB:
+  case 2:
     return (!(year % 4) && year % 100) || !(year % 400) ? 29 : 28;
   default:
     throw std::logic_error("Invalid month!");

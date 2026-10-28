@@ -9,22 +9,8 @@
 
 using Time = std::uint32_t;
 using Day = std::uint16_t;
+using Month = std::uint16_t;
 using Year = std::uint16_t;
-
-enum class Month {
-  JAN,
-  FEB,
-  MAR,
-  APR,
-  MAY,
-  JUN,
-  JUL,
-  AUG,
-  SEP,
-  OCT,
-  NOV,
-  DEC,
-};
 
 class DateTime {
 public:

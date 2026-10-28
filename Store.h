@@ -28,11 +28,10 @@ inline void save(const Events &events, const Tasks &tasks) {
   }
 
   for (const Event &event : events) {
-    efile << event.start().day() << ' '
-          << static_cast<int>(event.start().month()) << ' '
+    efile << event.start().day() << ' ' << event.start().month() << ' '
           << event.start().year() << ' ' << event.start().mins() << ' '
-          << event.end().day() << ' ' << static_cast<int>(event.end().month())
-          << ' ' << event.end().year() << ' ' << event.end().mins() << ' '
+          << event.end().day() << ' ' << event.end().month() << ' '
+          << event.end().year() << ' ' << event.end().mins() << ' '
           << std::quoted(event.title()) << '\n';
   }
 
@@ -41,8 +40,8 @@ inline void save(const Events &events, const Tasks &tasks) {
   }
 
   for (const Task &task : tasks) {
-    tfile << task.due().day() << ' ' << static_cast<int>(task.due().month())
-          << ' ' << task.due().year() << ' ' << task.due().mins() << ' '
+    tfile << task.due().day() << ' ' << task.due().month() << ' '
+          << task.due().year() << ' ' << task.due().mins() << ' '
           << task.isDone() << ' ' << std::quoted(task.title()) << '\n';
   }
 
@@ -72,11 +71,11 @@ inline void load(Events &events, Tasks &tasks) {
     std::istringstream row(line);
 
     Day start_day;
-    int start_month;
+    Month start_month;
     Year start_year;
     Time start_mins;
     Day end_day;
-    int end_month;
+    Month end_month;
     Year end_year;
     Time end_mins;
     std::string title;
@@ -86,13 +85,12 @@ inline void load(Events &events, Tasks &tasks) {
       throw std::runtime_error("Malformed event on line " +
                                std::to_string(line_number));
 
-    if (start_month < 0 || start_month > 11 || end_month < 0 || end_month > 11)
+    if (start_month < 1 || start_month > 12 || end_month < 1 || end_month > 12)
       throw std::runtime_error("Invalid month on line " +
                                std::to_string(line_number));
 
-    events.emplace(start_day, static_cast<Month>(start_month), start_year,
-                   start_mins, end_day, static_cast<Month>(end_month), end_year,
-                   end_mins, std::move(title));
+    events.emplace(start_day, start_month, start_year, start_mins, end_day,
+                   end_month, end_year, end_mins, std::move(title));
   }
 
   if (!efile.eof()) {
@@ -111,7 +109,7 @@ inline void load(Events &events, Tasks &tasks) {
     std::istringstream row(line);
 
     Day due_day;
-    int due_month;
+    Month due_month;
     Year due_year;
     Time due_mins;
     bool done = false;
@@ -122,12 +120,12 @@ inline void load(Events &events, Tasks &tasks) {
       throw std::runtime_error("Malformed task on line " +
                                std::to_string(line_number));
 
-    if (due_month < 0 || due_month > 11)
+    if (due_month < 1 || due_month > 12)
       throw std::runtime_error("Invalid month on line " +
                                std::to_string(line_number));
 
-    tasks.emplace(due_day, static_cast<Month>(due_month), due_year, due_mins,
-                  std::move(title), done);
+    tasks.emplace(due_day, due_month, due_year, due_mins, std::move(title),
+                  done);
   }
 
   if (!tfile.eof()) {
