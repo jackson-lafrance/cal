@@ -34,6 +34,19 @@ int main() {
   Tasks task_set;
   seed_fake_data(event_set, task_set);
 
+  const auto render = [&](const std::string &error) {
+    try {
+      Display::print_screen(event_set, task_set, start_cursor, error);
+      return true;
+    } catch (const std::exception &e) {
+      std::cout << e.what();
+      return false;
+    }
+  };
+
+  if (!render(""))
+    return 1;
+
   for (;;) {
     std::string command;
     std::string error;
@@ -86,12 +99,8 @@ int main() {
       error = e.what();
     }
 
-    try {
-    Display::print_screen(event_set, task_set, start_cursor, error);
-    } catch (const std::exception &e) {
-      std::cout << e.what();
-      exit(1);
-    }
+    if (!render(error))
+      return 1;
   }
 
   return 0;
