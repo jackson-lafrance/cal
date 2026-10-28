@@ -20,13 +20,16 @@ public:
   }
 
   Task(Day due_day, Month due_month, Year due_year, Time due_mins,
-       std::string title)
-      : due_(due_day, due_month, due_year, due_mins), title_(title) {
+       std::string title, bool done = false)
+      : due_(due_day, due_month, due_year, due_mins), title_(title),
+        done_(done) {
     if (title_.length() > 52)
       throw std::runtime_error("Title must be <= 52 chars");
   }
 
   const DateTime &due() const { return due_; }
+  bool isDone() const { return done_; }
+  void complete() { done_ = !done_; }
   const std::string title(int line = 0) const {
     if (line == 0)
       return title_;
@@ -47,6 +50,7 @@ public:
 private:
   DateTime due_;
   std::string title_;
+  bool done_;
 };
 
 using Tasks = std::set<Task, std::less<>>;

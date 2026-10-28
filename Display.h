@@ -242,14 +242,16 @@ private:
             offset < task.title().length()
                 ? task.title().substr(offset, title_width)
                 : "";
-        std::cout << left_border << std::left << std::setw(title_width)
-                  << title_segment;
+        std::cout << left_border;
+        begin_task_text(task);
+        std::cout << std::left << std::setw(title_width) << title_segment;
 
         if (line == 0)
           std::cout << " " << task.due().time_string();
         else if (line == 1)
           std::cout << " " << task.due().date_string();
 
+        end_task_text(task);
         std::cout << "│";
         offset += title_width;
         top_++;
@@ -287,13 +289,23 @@ private:
 
       jump();
       if (e == event_set.end()) {
-        std::cout << "│" << std::left << std::setw(26) << t->title(1) << "│"
-                  << t->due().time_string() << " │";
+        std::cout << "│";
+        begin_task_text(*t);
+        std::cout << std::left << std::setw(26) << t->title(1);
+        end_task_text(*t);
+        std::cout << "│";
+        begin_task_text(*t);
+        std::cout << t->due().time_string() << " ";
+        end_task_text(*t);
+        std::cout << "│";
         if (t->title().length() > 26) {
           ++top_;
           jump();
-          std::cout << "│" << std::left << std::setw(26) << t->title(2)
-                    << "│      │";
+          std::cout << "│";
+          begin_task_text(*t);
+          std::cout << std::left << std::setw(26) << t->title(2);
+          end_task_text(*t);
+          std::cout << "│      │";
         }
         ++t;
       } else if (t == task_set.end()) {
@@ -329,13 +341,23 @@ private:
         }
         ++e;
       } else {
-        std::cout << "│" << std::left << std::setw(26) << t->title(1) << "│"
-                  << t->due().time_string() << " │";
+        std::cout << "│";
+        begin_task_text(*t);
+        std::cout << std::left << std::setw(26) << t->title(1);
+        end_task_text(*t);
+        std::cout << "│";
+        begin_task_text(*t);
+        std::cout << t->due().time_string() << " ";
+        end_task_text(*t);
+        std::cout << "│";
         if (t->title().length() > 26) {
           ++top_;
           jump();
-          std::cout << "│" << std::left << std::setw(26) << t->title(2)
-                    << "│      │";
+          std::cout << "│";
+          begin_task_text(*t);
+          std::cout << std::left << std::setw(26) << t->title(2);
+          end_task_text(*t);
+          std::cout << "│      │";
         }
         ++t;
       }
@@ -343,6 +365,16 @@ private:
       ++top_;
       ++top_;
     }
+  }
+
+  void begin_task_text(const Task &task) {
+    if (task.isDone())
+      std::cout << CSI << "32m";
+  }
+
+  void end_task_text(const Task &task) {
+    if (task.isDone())
+      std::cout << CSI << "0m";
   }
 
   void jump() { std::cout << CSI << (top_ + 1) << ";" << (left_ + 1) << "H"; }
